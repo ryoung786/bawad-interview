@@ -1,0 +1,21 @@
+<table>
+  <tr>
+    <%= th(:name, @sort) %>
+    <%= th(:city, @sort) %>
+    <%= th(:state, @sort) %>
+    <%= th(:country, @sort) %>
+    <%= th(:street_number, @sort) %>
+    <%= th(:street_name, @sort) %>
+  </tr>
+
+  <%= for user <- @users do %>
+    <tr>
+      <td><%= user.name %></td>
+      <td><%= user.city %></td>
+      <td><%= user.state %></td>
+      <td><%= user.country %></td>
+      <td><%= user.street_number %></td>
+      <td><%= user.street_name %></td>
+    </tr>
+  <% end %>
+</table>
