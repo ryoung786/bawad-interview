@@ -23,10 +23,15 @@ defmodule BawadWeb.PageLive do
     field = sanitize_sort_field_param(params["sort"], socket.assigns.sort.field)
     order = sanitize_sort_order_param(params["dir"], socket.assigns.sort.order)
 
+    users =
+      socket.assigns.unsorted_users
+      |> sort_users(field, order)
+      |> filter_users(socket.assigns.query)
+
     {:noreply,
      socket
      |> assign(sort: %{field: field, order: order})
-     |> assign(users: sort_users(socket.assigns.unsorted_users, field, order))}
+     |> assign(users: users)}
   end
 
   @impl true
@@ -38,6 +43,16 @@ defmodule BawadWeb.PageLive do
 
     url = BawadWeb.Router.Helpers.page_path(socket, :index, %{sort: field, dir: dir})
     {:noreply, push_patch(socket, to: url)}
+  end
+
+  @impl true
+  def handle_event("filter", %{"query" => q}, socket) do
+    users =
+      socket.assigns.unsorted_users
+      |> sort_users(socket.assigns.sort.field, socket.assigns.sort.order)
+      |> filter_users(q)
+
+    {:noreply, assign(socket, query: q, users: users)}
   end
 
   defp next_sort_order(:unsorted), do: :asc
@@ -56,6 +71,14 @@ defmodule BawadWeb.PageLive do
     Enum.sort_by(users, fn user -> user[field] end, dir)
   end
 
+  defp filter_users(users, query) do
+    Enum.filter(users, fn user ->
+      Enum.any?(Map.values(user), fn field ->
+        "#{field}" |> String.downcase() |> String.contains?(query)
+      end)
+    end)
+  end
+
   defp fetch_users() do
     response = HTTPoison.get!("https://randomuser.me/api/?results=20")
     %{"results" => users} = Jason.decode!(response.body)
@@ -72,6 +95,7 @@ defmodule BawadWeb.PageLive do
     end)
   end
 
+  # template helper
   def th(field, %{field: sort_field, order: sort_order}) do
     assigns = %{
       value: Atom.to_string(field),
@@ -84,7 +108,6 @@ defmodule BawadWeb.PageLive do
         end
     }
 
-    # render(BawadWeb.DefaultView, "table_header.html", %{field: field, sort: sort})
     render(BawadWeb.DefaultView, "table_header.html", assigns)
   end
 end
