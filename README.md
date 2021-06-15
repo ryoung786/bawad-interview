@@ -1,7 +1,7 @@
 I watched this [practice interview](https://www.youtube.com/watch?v=6s0OVdoo4Q4) with Ben Awad and Clément Mihailescu and decided to try and implement it with Phoenix Liveview.  I wanted to see if the development process would be faster and if the resulting code might be easier to understand.
 
 # Demo solution
-https://bawad-interview.gigalixir.com
+The app is running on the [Gigalixir](https://gigalixir.com/) free tier: [https://bawad-interview.gigalixirapp.com](https://bawad-interview.gigalixirapp.com)
 
 # Interview
 ## Initial prompt
