@@ -3,6 +3,8 @@ I watched this [practice interview](https://www.youtube.com/watch?v=6s0OVdoo4Q4)
 # See it in action
 The app is running on the [Gigalixir](https://gigalixir.com/) free tier: [https://bawad-interview.gigalixirapp.com](https://bawad-interview.gigalixirapp.com)
 
+![demo](https://raw.githubusercontent.com/ryoung786/bawad-interview/main/demo.gif)
+
 # Interview
 ## Initial prompt
 > We want a site that will display "flattened" results from the `randomuser` api endpoint [https://randomuser.me/api/?results=20](https://randomuser.me/api/?results=20).  The endpoint will return user data as nested json.  Each user record returned should be displayed as a single row in a table, with at a minimum the user's `name`, `city`, `street number`, and `street name` visible.
@@ -123,7 +125,7 @@ Our table headers now need to be updated so that they trigger a click event, so 
 The important parts are the `phx-click` and `phx-value-field` attributes, which tell liveview that when clicked to send a "sort" event for the backend to handle.  The `phx-value-field` tells it to include the field name that was clicked on, which we'll need to know what to sort by.
 
 Instead of modifying our `sort` assign right in the event handler, I think it'll be a bit more idiomatic to use `push_patch` to set the url and include the field and direction as url parameters.  This way, links can be shared around and will retain the sorted views.  To make that possible in liveview, we need to add a `handle_params` function, which reads the params, sorts the `users` appropriately, assigns the new values to the socket, and re-renders the output.
-```
+```elixir
 @impl true
 def handle_event("sort", %{"field" => field}, socket) do
   dir =
@@ -160,7 +162,7 @@ At this point, we now have the ability to click on a column and toggle the sort 
 > When the end user clicks on a column header multiple times, instead of toggling between ascending and descending, it should now cycle between unsorted, then ascending, then descending, and back to unsorted, in that order.
 
 Our implementation makes this pretty straight forward.  Instead of `toggle_sort_order`, we can replace that with something like
-```
+```elixir
 defp next_sort_order(:unsorted), do: :asc
 defp next_sort_order(:asc), do: :desc
 defp next_sort_order(:desc), do: :unsorted
@@ -177,7 +179,7 @@ This is where Liveview really shines, in my opinion.  We start by adding a text 
 </form>
 ```
 We're using a new assigns, `@query`, which we'll have to set in `mount`.  `phx-change` fires whenever the text input value changes, so we need to handle that new event.  It needs to filter out any users that don't have any fields that match the query string.
-```
+```elixir
 @impl true
 def handle_event("filter", %{"query" => q}, socket) do
   users =
