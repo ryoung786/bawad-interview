@@ -6,7 +6,7 @@ defmodule BawadWeb.PageLive do
 
   @impl true
   def mount(_params, _session, socket) do
-    users = fetch_users()
+    users = if connected?(socket), do: fetch_users(), else: []
 
     {:ok,
      assign(socket,
